@@ -9,7 +9,7 @@ export function CompanyForm({ companyId, name, color }: { companyId: string; nam
     <form action={action} className="flex flex-wrap items-end gap-2">
       <label className="space-y-1 text-sm">
         <span>Nome</span>
-        <input name="name" defaultValue={name} required className="input" />
+        <input name="name" defaultValue={name} required autoComplete="off" className="input" />
       </label>
       <label className="space-y-1 text-sm">
         <span>Cor</span>
@@ -34,11 +34,11 @@ export function AdAccountForm({ companyId }: { companyId: string }) {
       </label>
       <label className="space-y-1 text-sm">
         <span>Nome da conta</span>
-        <input name="name" required className="input" />
+        <input name="name" required autoComplete="off" className="input" />
       </label>
       <label className="space-y-1 text-sm">
         <span>ID da conta</span>
-        <input name="external_id" placeholder="opcional" className="input" />
+        <input name="external_id" autoComplete="off" spellCheck={false} placeholder="Opcional, ex.: act_123…" className="input" />
       </label>
       <label className="w-20 space-y-1 text-sm">
         <span>Moeda</span>

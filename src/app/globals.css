@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light dark;
   --background: #ffffff;
   --foreground: #171717;
   /* gráficos: Meta = série 1 (azul), Google = série 2 (laranja) */
@@ -38,14 +39,34 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
+/* toques sem atraso de zoom duplo; foco visível só para teclado */
+a,
+button,
+select,
+input,
+label {
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 2px solid var(--series-1);
+  outline-offset: 2px;
+}
+
 @layer components {
+  /* fundo e cor explícitos: o <select> nativo no modo escuro do Windows fica ilegível sem isso */
   .input {
-    @apply w-full rounded-lg border border-black/15 bg-transparent px-3 py-2 text-sm dark:border-white/20;
+    @apply w-full rounded-lg border border-black/15 bg-background px-3 py-2 text-sm text-foreground dark:border-white/20;
   }
   .btn {
-    @apply rounded-lg border border-black/15 px-3 py-2 text-sm hover:bg-black/5 disabled:opacity-50 dark:border-white/20 dark:hover:bg-white/10;
+    @apply rounded-lg border border-black/15 px-3 py-2 text-sm transition-colors hover:bg-black/5 disabled:opacity-50 dark:border-white/20 dark:hover:bg-white/10;
   }
   .btn-primary {
-    @apply rounded-lg bg-foreground px-3 py-2 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50;
+    @apply rounded-lg bg-foreground px-3 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50;
   }
+}
+
+html {
+  /* o cabeçalho fixo não cobre o elemento focado ao navegar por teclado */
+  scroll-padding-top: 4.5rem;
 }

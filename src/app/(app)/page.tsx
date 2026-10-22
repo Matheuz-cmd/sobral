@@ -18,8 +18,8 @@ export default async function HomePage() {
   );
 
   return (
-    <main className="space-y-8">
-      <h1 className="text-2xl font-semibold">Clientes e empresas</h1>
+    <div className="space-y-8">
+      <h1 className="text-2xl font-semibold text-balance">Clientes e empresas</h1>
       <NewClientForm />
       {active.length === 0 && <p className="opacity-70">Crie o primeiro cliente para começar.</p>}
 
@@ -95,6 +95,6 @@ export default async function HomePage() {
           </ul>
         </section>
       )}
-    </main>
+    </div>
   );
 }

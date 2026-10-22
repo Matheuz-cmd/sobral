@@ -8,6 +8,12 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 
   return (
     <div className="min-h-screen">
+      <a
+        href="#conteudo"
+        className="sr-only rounded-lg bg-foreground px-3 py-2 text-sm text-background focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-30"
+      >
+        Pular para o conteúdo
+      </a>
       <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-black/10 bg-background px-4 py-3 dark:border-white/15">
         <Link href="/" className="font-semibold">BI Ads</Link>
         <CompanySwitcher clients={clients} />
@@ -15,7 +21,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           <button className="btn">Sair</button>
         </form>
       </header>
-      <div className="mx-auto max-w-6xl p-4">{children}</div>
+      <main id="conteudo" className="mx-auto max-w-6xl p-4">{children}</main>
     </div>
   );
 }
