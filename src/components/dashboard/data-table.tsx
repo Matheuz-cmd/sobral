@@ -38,7 +38,11 @@ function TypeSelect({ companyId, campaignId, value }: { companyId: string; campa
 }
 
 function toCsv(columns: Column[], rows: TableRow[]): string {
-  const cell = (v: string) => (/[";\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+  const cell = (raw: string) => {
+    // Nomes começando com = + - @ virariam fórmula ao abrir no Excel (injeção de CSV).
+    const v = /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw;
+    return /[";\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+  };
   const lines = [
     columns.map((c) => cell(c.label)).join(";"),
     ...rows.map((r) =>
@@ -141,7 +145,7 @@ export function DataTable({
                   }
                   const numeric = i > 0 && c.format !== "text" && c.format !== "campaign_type";
                   return (
-                    <td key={c.key} className={`px-3 py-2 ${numeric ? "whitespace-nowrap text-right tabular-nums" : ""} ${i === 0 ? "max-w-xs" : ""}`}>
+                    <td key={c.key} className={`px-3 py-2 ${numeric ? "whitespace-nowrap text-right tabular-nums" : ""} ${i === 0 ? "max-w-xs break-words" : ""}`}>
                       {content}
                     </td>
                   );

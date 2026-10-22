@@ -32,6 +32,11 @@ export function formatDate(iso: string | null | undefined): string {
 /** aaaa-mm-dd → dd/mm */
 export const formatDayMonth = (iso: string) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
 
-export function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
-}
+// Fuso fixo: o servidor (Vercel, UTC) e o navegador precisam gerar o mesmo texto.
+const dateTime = new Intl.DateTimeFormat("pt-BR", {
+  dateStyle: "short",
+  timeStyle: "short",
+  timeZone: "America/Sao_Paulo",
+});
+
+export const formatDateTime = (iso: string) => dateTime.format(new Date(iso));
