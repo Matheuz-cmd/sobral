@@ -1,6 +1,18 @@
 # PRD — BI de tráfego pago (Meta Ads + Google Ads)
 
-Oct 21, 2026 · @Ultra-x-ti
+Oct 21, 2026 · @Ultra-x-ti · revisado em Oct 22, 2026
+
+## Situação atual
+
+As Fases 0 a 2 (MVP) estão implementadas e a importação foi validada com relatórios reais do Meta e do Google. A próxima etapa é a **Fase 2.5 — acompanhamento e análises**, que só usa dados já importados e não depende das APIs (ver Requisitos funcionais, RF22 a RF29).
+
+| Fase | Situação |
+| --- | --- |
+| 0 · Base (banco com RLS, login, clientes, empresas, contas) | Pronta |
+| 1 · Importação por upload | Pronta e validada com relatórios reais |
+| 2 · Dashboards Meta, Google e visão geral | Pronta; falta conferir o investimento contra as plataformas (portão da fase) |
+| 2.5 · Acompanhamento e análises | Próxima |
+| 3 · Coleta por API | Futura |
 
 ## Visão geral
 
@@ -21,6 +33,7 @@ O objetivo do MVP é que, a partir dos relatórios exportados, cada empresa tenh
 - Guardar histórico próprio por empresa, acumulando as importações.
 - Exibir dashboards de Meta Ads, de Google Ads e uma visão consolidada das duas plataformas por empresa.
 - Comparar períodos (esta semana × anterior, este mês × anterior).
+- Fase 2.5: acompanhar a competência de cada cliente, ser avisado de contas paradas e de criativos desgastados, e gerar a apresentação mensal direto do sistema.
 
 **Métricas de sucesso**
 
@@ -114,6 +127,28 @@ O MVP tem cinco blocos: clientes e empresas, importação, dashboard Meta Ads, d
 - RF20: exportar a tabela visível em CSV.
 - RF21: login com Supabase Auth e papel por usuário (só admin no MVP).
 
+**Fase 2.5 — acompanhamento e análises (só com dados importados)**
+
+Estes requisitos vieram do uso real do sistema na preparação das reuniões de outubro/2026 e de uma pesquisa em ferramentas do mercado (Reportei, mLabs Analytics, Swydo, AgencyAnalytics, Optmyzr, Madgicx). Nenhum depende das APIs.
+
+- RF22: **competência por empresa**: cada empresa define o dia em que começa o seu ciclo (ex.: dia 21, para fechar de 21 a 20). Os filtros ganham "Competência atual" e "Competência anterior", e a comparação usa a competência anterior com o mesmo número de dias corridos.
+- RF23: **alertas**, na tela inicial e no topo da empresa:
+  - conta sem investimento há N dias seguidos (padrão: 3), quando ela já teve veiculação antes;
+  - importação atrasada: o último dia importado de uma conta está há mais de N dias (padrão: 7);
+  - possível desgaste de criativo (RF26).
+- RF24: **análise por dia da semana**: investimento, resultado principal e custo por resultado agregados por dia da semana no período, em tabela ou mapa de calor, destacando os dias sem veiculação (ex.: conta que só roda de segunda a sábado).
+- RF25: **alcance correto**: importação opcional de um relatório de alcance do período, exportado sem o detalhamento por dia, guardado à parte das métricas diárias. Quando existir um relatório para exatamente o período e o nível exibidos, os cards mostram o alcance e a frequência reais; nos demais casos continuam mostrando impressões.
+- RF26: **frequência e alerta de desgaste**: por anúncio, a frequência diária (impressões ÷ alcance do dia) e a comparação dos últimos 7 dias com os 7 anteriores. O anúncio é marcado como "possível desgaste" quando o CTR cai 20% ou mais com a frequência subindo, ou quando o custo por resultado sobe 20% ou mais. Os limites ficam configuráveis por empresa.
+- RF27: **ranking de criativos**: tabela de anúncios do período com investimento, resultado do tipo da campanha, custo por resultado, CTR e frequência média, ordenável, com os 5 melhores e os 5 piores em destaque e o selo de desgaste do RF26. Anúncios com investimento abaixo de um mínimo (padrão: R$ 10) ficam fora do ranking, para não distorcer.
+- RF28: **anotações na linha do tempo**: registrar eventos por empresa, com data ou intervalo e, opcionalmente, plataforma ou campanha (promoção, novo criativo, pausa, feriado, loja fechada). Aparecem como marcadores nos gráficos diários e na apresentação.
+- RF29: **apresentação gerada pelo sistema**: para uma empresa e uma competência, gerar a apresentação de reunião no formato usado em outubro/2026:
+  - abertura e "como ler os números";
+  - competência: resumo, detalhes por tipo de campanha, semana a semana e comparação com a anterior;
+  - panorama: total, mês a mês e ranking de criativos;
+  - anotações do período e próximos passos.
+
+  Cada seção aceita um comentário do gestor antes de exportar, há notas do apresentador e a exportação é em PDF. O link pode ser compartilhado com o cliente em modo leitura.
+
 ## Resultados por tipo de campanha
 
 O dashboard não usa um "resultado" único: cada tipo de campanha tem suas métricas principais, e campanhas de mensagem para o WhatsApp não exibem resultado.
@@ -174,6 +209,12 @@ Para a importação funcionar sempre, cada plataforma tem um relatório padrão 
 
 Os nomes exatos das colunas mudam com o idioma da conta e com as colunas escolhidas; por isso o sistema mapeia colunas por sinônimos e deixa o usuário corrigir na pré-visualização.
 
+**Aprendizados com os relatórios reais (out/2026)**
+
+- **Meta:** a exportação da conta usa "Valor gasto (BRL)", "Tipo de resultado" e "Seguidores no Instagram"; esses nomes estão nos sinônimos. Nos dias sem resultado, "Tipo de resultado" vem vazio, por isso o tipo da campanha é o que aparece nos outros dias do mesmo arquivo.
+- **Google:** campanhas **Inteligentes** não têm grupo de anúncios no relatório. Nesse caso a linha é gravada no nível de campanha, e "Conversões" é aceito quando "Todas as conv." não existir.
+- **Google, arquivo errado:** o download da página "Visão geral" (gráficos em .zip) não é o relatório de campanhas. O certo é Relatórios → Novo → Tabela, com linhas Campanha, Dia (e Grupo de anúncios e Ação de conversão quando houver) e colunas Custo, Impr., Cliques e Todas as conv.
+
 **Nível do relatório no Meta**: o padrão é exportar no nível de anúncio, porque cada linha traz o anúncio, o conjunto e a campanha do dia, e o sistema soma para cima. Há dois caminhos no Gerenciador:
 
 - Na aba **Anúncios**, selecionar o período, ativar o detalhamento por dia e usar **Exportar dados da tabela**.
@@ -210,6 +251,16 @@ Uma única tabela de métricas diárias serve às duas plataformas, e as tabelas
 | `imports` | Histórico: arquivo, plataforma, conta, período, linhas lidas, linhas com erro, status | `id` · `company_id` |
 | `column_mappings` | Mapeamento salvo de colunas do arquivo para campos do sistema | `company_id` + `platform` |
 | `user_settings` | Última empresa aberta e preferências | `user_id` |
+| `metrics_staging` | Linhas de uma importação em andamento; `commit_import` move tudo para `metrics_daily` numa transação | `import_id` |
+
+**Novas tabelas e colunas da Fase 2.5**
+
+| Tabela | Conteúdo | Chave e vínculos |
+| --- | --- | --- |
+| `companies` (novas colunas) | `cycle_start_day` (dia de início da competência, 1 a 28) e `settings` (limites dos alertas e do desgaste, em JSON) | — |
+| `reach_snapshots` | Alcance, impressões e frequência de um período inteiro, vindos de um relatório sem detalhamento por dia (RF25) | `ad_account_id` + `level` + `object_key` + `period_start` + `period_end` |
+| `annotations` | Eventos da linha do tempo: data inicial e final, título, nota, plataforma e campanha opcionais (RF28) | `id` · `company_id` |
+| `reports` | Apresentações geradas: empresa, competência, comentários por seção, próximos passos, data de geração (RF29) | `id` · `company_id` |
 
 **Usuários e papéis**
 
@@ -223,21 +274,33 @@ No MVP, ao criar uma empresa o sistema cria automaticamente o vínculo `owner` d
 **Views para os dashboards**
 
 - `v_daily_by_platform`: totais por empresa, plataforma e dia.
-- `v_campaign_summary`: totais por campanha no período, com CTR, CPC, CPA e custo por resultado recalculados das somas.
+- `v_daily_by_campaign_type`: totais por empresa, plataforma, tipo de campanha e dia. Os cards de resultado usam só as campanhas do tipo certo (ex.: custo por visita = investimento das campanhas de visitas ÷ visitas delas).
+- `campaign_summary(empresa, de, até, conta)`: totais por campanha no período, com CTR, CPC, CPM e custos por resultado recalculados das somas. É uma função, e não uma view, porque precisa receber o período.
+
+Todas as views e funções rodam com `security_invoker`, então respeitam a RLS de quem consulta. Como `commit_import` apaga todos os níveis da conta no período antes de gravar, cada conta e dia tem um único nível, e as somas podem considerar todas as linhas sem contar em dobro.
 
 Com a chave por conta, nível, objeto e data, a fase de APIs pode gravar na mesma tabela `metrics_daily` sem mudar os dashboards.
 
 ## Skills e ferramentas para o desenvolvimento
 
-O desenvolvimento será feito com um agente de código (como o Claude Code) apoiado em skills, começando pela `find-skills` para descobrir as demais.
+O desenvolvimento é feito com um agente de código (Claude Code) apoiado em skills. As skills do projeto ficam versionadas em `.claude/skills/`; as gerais, na pasta do usuário.
 
-| Skill | Para que serve neste projeto | Instalação |
+| Skill | Para que serve neste projeto | Onde está |
 | --- | --- | --- |
-| [find-skills](https://skills.sh/vercel-labs/skills/find-skills) (Vercel Labs) | Buscar e instalar skills do ecossistema skills.sh conforme surgir a necessidade (ex.: Supabase, gráficos, parsing de CSV) | `npx skills add vercel-labs/skills@find-skills -g -y` |
-| frontend-design (Anthropic) | Direção visual dos dashboards: tipografia, cores e layout com identidade própria, fugindo do visual genérico | repositório `anthropics/skills` |
-| [web-design-guidelines](https://skills.sh/vercel-labs/agent-skills/web-design-guidelines) (Vercel Labs) | Revisar a interface contra boas práticas de UI e acessibilidade | `npx skills add vercel-labs/agent-skills@web-design-guidelines` |
-| [vercel-react-best-practices](https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices) (Vercel Labs) | Padrões de desempenho em React e Next.js na Vercel | `npx skills add vercel-labs/agent-skills@vercel-react-best-practices` |
-| skill-creator (Anthropic) | Criar uma skill própria do projeto, por exemplo com as regras de importação e o mapeamento de colunas do Meta e do Google | repositório `anthropics/skills` |
+| [find-skills](https://skills.sh/vercel-labs/skills/find-skills) (Vercel Labs) | Buscar e instalar skills do ecossistema skills.sh conforme surgir a necessidade (ex.: Supabase, gráficos, parsing de CSV) | Instalada em `~/.claude/skills` |
+| [web-design-guidelines](https://skills.sh/vercel-labs/agent-skills/web-design-guidelines) (Vercel Labs) | Revisar a interface contra boas práticas de UI e acessibilidade | Instalada no projeto |
+| [vercel-react-best-practices](https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices) (Vercel Labs) | Padrões de desempenho e segurança em React e Next.js na Vercel | Instalada no projeto |
+| [scroll-craft](https://github.com/nateherkai/scroll-craft) (Nate Herk, MIT) | Landing pages com rolagem animada. Não serve para os dashboards; fica para páginas de venda ou a página pública do serviço. A geração de imagens usa o kie.ai, que é pago | Instalada no projeto |
+| skill-creator (Anthropic) | Criar uma skill própria do projeto, por exemplo com as regras de importação e o mapeamento de colunas do Meta e do Google | Já vem com o Claude Code (`anthropic-skills:skill-creator`) |
+| dataviz (Anthropic) | Gráficos, cores e cards de métrica dos dashboards; usada na Fase 2 | Já vem com o Claude Code |
+| frontend-design (Anthropic) | Direção visual dos dashboards | Não instalada |
+
+**Primeira revisão com as skills (out/2026)**: com base na `vercel-react-best-practices` e na `web-design-guidelines`, as server actions passaram a conferir a sessão e validar os argumentos. Também foram corrigidos:
+
+- o fuso das datas, que causava erro de hidratação;
+- a injeção de fórmula no CSV exportado;
+- o carregamento do Recharts, que passou a ser sob demanda;
+- a acessibilidade: foco visível, link para pular ao conteúdo, seletor de empresa por teclado, telas de carregamento e de erro.
 
 **Buscas sugeridas com a find-skills**
 
@@ -257,15 +320,39 @@ O MVP são as Fases 0 a 2; cada fase só começa quando o portão anterior é cu
 
 A importação vem antes dos dashboards porque um painel sobre dados lidos errado só gera retrabalho. As APIs entram na Fase 3, gravando nas mesmas tabelas, quando o fluxo por upload já estiver validado com clientes reais.
 
+**Fase 2.5 — acompanhamento e análises** (entre a Fase 2 e as APIs). Entram os RF22 a RF29, nesta ordem:
+
+1. Competência por empresa, alertas de conta parada e de importação atrasada, e análise por dia da semana. Só usam dados que já existem.
+2. Alcance correto, frequência com alerta de desgaste e ranking de criativos.
+3. Anotações e a apresentação gerada pelo sistema.
+
+**Portão da Fase 2.5**: a apresentação de uma competência real sai do sistema sem ajuste manual de números.
+
 ## Features futuras
 
-As três features abaixo ficam fora do MVP, e o modelo de dados já está preparado para elas.
+As features abaixo ficam fora da Fase 2.5, e o modelo de dados já está preparado ou é facilmente estendido para elas.
 
-| Feature | O que muda | O que já está pronto no MVP |
+| Feature | O que muda | O que já está pronto |
 | --- | --- | --- |
 | Coleta automática por API | Marketing API (Meta) e Google Ads API puxam os dados todo dia, sem exportar relatórios; seguidores do Instagram hoje não vêm pela Marketing API e continuariam por importação | Tabela `metrics_daily` com chave por conta, nível, objeto e data; contas de anúncios com id externo |
 | Acesso dos clientes | Cada cliente ganha login próprio e vê, em modo leitura, só as empresas liberadas para ele (uma ou várias) | Papel `client` previsto e RLS filtrando por `company_members` |
-| Relatório em PDF | Gerar e enviar ao cliente um resumo do período em PDF | Views agregadas por empresa, plataforma e campanha |
+| Resultados reais e metas de custo | O gestor ou o cliente lança por semana as conversas reais e os agendamentos ou vendas, e o painel calcula o custo por agendamento; metas de custo por resultado por empresa, com destaque quando passam do limite | Métricas diárias por empresa e conta |
+| Detalhamentos demográficos | Idade, gênero, posicionamento e horário. O Meta exporta um detalhamento por arquivo, então cada um é uma importação separada | Importação com mapeamento por sinônimos |
+| Rastreamento automático do WhatsApp | Saber de qual anúncio veio cada conversa e se ela virou agendamento ou venda (ver abaixo) | Campanhas de mensagem já identificadas pelo tipo |
+
+**Rastreamento do WhatsApp sem ferramenta paga.** Há dois caminhos.
+
+- **Manual, custo zero, possível já:**
+  - cada anúncio de mensagem usa uma mensagem pré-preenchida diferente (ex.: "Olá! Vi o combo semanal");
+  - o atendimento marca a conversa com uma etiqueta do WhatsApp Business ("Anúncio — combo") e anota se virou agendamento;
+  - uma vez por semana, os totais entram no sistema pela feature "Resultados reais".
+- **Automático, sem ferramenta paga, mas com trabalho técnico:**
+  - quando a conversa começa por um anúncio de clique para o WhatsApp, a API oficial do WhatsApp (Cloud API, da Meta) envia ao webhook um objeto de origem com o id do anúncio e um identificador do clique (`ctwa_clid`);
+  - uma rota deste próprio sistema na Vercel pode receber esse webhook e gravar a conversa ligada ao anúncio;
+  - o envio das vendas de volta ao Meta usa a API de Conversões.
+  - Custo: as conversas iniciadas pelo cliente não têm custo de mensagem; mesmo assim, conferir as regras de cobrança e de coexistência com o app WhatsApp Business antes de implementar.
+  - Requisito: o número do cliente precisa estar conectado à Cloud API.
+  - Prazo: entra junto com a fase de APIs.
 
 ## Riscos e questões em aberto
 
@@ -278,7 +365,10 @@ O maior risco do MVP é a variação no formato dos relatórios exportados quebr
 | Esquecer de importar algum período | Buracos nos gráficos | Mostrar o último dia importado por conta e destacar dias sem dados |
 | Dado de uma empresa aparecer em outra | Quebra de confiança | RLS por usuário + filtro obrigatório por empresa no servidor |
 | Importar duas vezes o mesmo período | Números dobrados | Substituir por conta e período em vez de somar |
+| Desfazer uma importação que substituiu outra | Dados antigos do período não voltam | Aviso na confirmação; reimportar o arquivo anterior (guardado no Storage) |
+| Alerta de desgaste com pouco volume | Falso alarme em anúncio com poucas impressões | Investimento mínimo para entrar no ranking e no alerta (RF27) |
 
 **Questões em aberto**
 
-Nenhuma questão em aberto no momento.
+- Os limites padrão dos alertas (3 dias sem investimento, 7 dias sem importação, queda de 20% no CTR) servem para todos os clientes, ou cada empresa precisa ajustar desde o início?
+- A apresentação do RF29 será compartilhada com o cliente como link (exige o acesso de clientes) ou só exportada em PDF?

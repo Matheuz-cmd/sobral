@@ -18,3 +18,8 @@ Testes: `npm test` (leitura de números/datas, mapeamento de colunas e normaliza
 - [x] Fase 0: banco com RLS, login, clientes, empresas, arquivar/excluir, contas de anúncios
 - [x] Fase 1: importação por upload (CSV/Excel), mapeamento por sinônimos, pré-visualização, gravação atômica sem duplicar, histórico e desfazer
 - [x] Fase 2: dashboards Meta, Google e visão geral (filtros de período e conta, comparação com o período anterior, tabelas com navegação e exportação CSV)
+- [ ] Fase 2.5: competência por empresa, alertas, dia da semana, alcance correto, desgaste de criativo, ranking, anotações e apresentação gerada (RF22 a RF29 do PRD)
+
+## Skills de agente
+
+As skills do projeto ficam em `.claude/skills/` (vercel-react-best-practices, web-design-guidelines, scroll-craft) e são carregadas pelo Claude Code ao abrir o projeto.
