@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DailyChart } from "@/components/dashboard/daily-chart";
+import { DailyChart } from "@/components/dashboard/daily-chart-lazy";
 import { DataNotice } from "@/components/dashboard/data-notice";
 import { DataTable, type Column, type TableRow } from "@/components/dashboard/data-table";
 import { FilterBar } from "@/components/dashboard/filter-bar";
