@@ -28,7 +28,7 @@ function TypeSelect({ companyId, campaignId, value }: { companyId: string; campa
       disabled={pending}
       aria-label="Tipo de campanha"
       onChange={(e) => start(() => setCampaignTypeAction(companyId, campaignId, e.target.value))}
-      className="rounded border border-black/15 bg-transparent px-1 py-0.5 text-xs dark:border-white/20"
+      className="rounded border border-black/15 bg-background px-1 py-0.5 text-xs text-foreground dark:border-white/20"
     >
       {Object.entries(CAMPAIGN_TYPES).map(([k, label]) => (
         <option key={k} value={k}>{label}</option>
@@ -41,7 +41,7 @@ function toCsv(columns: Column[], rows: TableRow[]): string {
   const cell = (raw: string) => {
     // Nomes começando com = + - @ virariam fórmula ao abrir no Excel (injeção de CSV).
     const v = /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw;
-    return /[";\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+    return /[";\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
   };
   const lines = [
     columns.map((c) => cell(c.label)).join(";"),
@@ -139,14 +139,14 @@ export function DataTable({
                       CAMPAIGN_TYPES[v as keyof typeof CAMPAIGN_TYPES]
                     );
                   } else if (i === 0 && row.href) {
-                    content = <Link href={row.href} className="underline-offset-2 hover:underline">{formatValue(v, "text")}</Link>;
+                    content = <Link href={row.href} prefetch={false} className="underline-offset-2 hover:underline">{formatValue(v, "text")}</Link>;
                   } else {
                     content = formatValue(v, c.format);
                   }
                   const numeric = i > 0 && c.format !== "text" && c.format !== "campaign_type";
                   return (
-                    <td key={c.key} className={`px-3 py-2 ${numeric ? "whitespace-nowrap text-right tabular-nums" : ""} ${i === 0 ? "max-w-xs break-words" : ""}`}>
-                      {content}
+                    <td key={c.key} className={`px-3 py-2 ${numeric ? "whitespace-nowrap text-right tabular-nums" : ""}`}>
+                      {i === 0 ? <div className="max-w-xs [overflow-wrap:anywhere]">{content}</div> : content}
                     </td>
                   );
                 })}

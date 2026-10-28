@@ -57,7 +57,7 @@ export function CompanySwitcher({ clients }: { clients: Client[] }) {
         ref={buttonRef}
         onClick={() => (open ? close() : setOpen(true))}
         aria-expanded={open}
-        aria-controls={panelId}
+        aria-controls={open ? panelId : undefined}
         className="btn flex max-w-[60vw] items-center gap-2"
       >
         <span aria-hidden="true" className="size-3 shrink-0 rounded-full" style={{ background: current?.color ?? "#9ca3af" }} />
@@ -87,6 +87,7 @@ export function CompanySwitcher({ clients }: { clients: Client[] }) {
                     <li key={e.id}>
                       <Link
                         href={`/empresa/${e.id}`}
+                        prefetch={false}
                         onClick={close}
                         aria-current={e.id === currentId ? "page" : undefined}
                         className="flex w-full min-w-0 items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-black/5 aria-[current=page]:font-medium dark:hover:bg-white/10"

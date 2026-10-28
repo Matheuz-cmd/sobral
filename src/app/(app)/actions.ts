@@ -51,9 +51,3 @@ export async function deleteAction(table: (typeof TABLES)[number], id: string) {
   await supabase.from(table).delete().eq("id", id);
   revalidatePath("/", "layout");
 }
-
-export async function rememberCompany(companyId: string) {
-  assertUuid(companyId);
-  const { supabase, userId } = await requireUser();
-  await supabase.from("user_settings").upsert({ user_id: userId, last_company_id: companyId });
-}

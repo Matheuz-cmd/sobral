@@ -21,7 +21,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           <button className="btn">Sair</button>
         </form>
       </header>
-      <main id="conteudo" className="mx-auto max-w-6xl p-4">{children}</main>
+      <main id="conteudo" tabIndex={-1} className="mx-auto max-w-6xl p-4 focus:outline-none">{children}</main>
     </div>
   );
 }
